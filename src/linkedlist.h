@@ -61,7 +61,7 @@ public:
 
 public:
     void push(T n) {
-        auto newNode = new node<T>;
+        node<T> *newNode = new node<T>;
         newNode->data = n;
         newNode->next = nullptr;
         if (head == nullptr) {
@@ -69,13 +69,21 @@ public:
             tail = newNode;
         } else {
             tail->next = newNode;
-            tail = tail->next;
+            tail = newNode;
         }
         _size++;
     }
 
     void push(T n, unsigned int index) {
         if (index > _size) throw std::out_of_range("Out of range");
+        if (index == 0) {
+            auto oldHead = head;
+            head = new node<T>;
+            head->data = n;
+            head->next = oldHead;
+            _size++;
+            return;
+        }
         unsigned int current = 0;
         auto currentNode = head;
         while (current != index - 1) {

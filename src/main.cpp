@@ -5,6 +5,7 @@
 #include "matrixarray.h"
 #include "priorityqueue.h"
 #include "priorityqueuelist.h"
+#include "sparsearray.h"
 #include <chrono>
 
 int main() {
@@ -60,19 +61,5 @@ int main() {
 //        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
 //        std::cout << elements << " add: " << elapsed << " ms" << std::endl;
 //    }
-    PriorityQueueList<int> p;
-    p.enqueue(1, 2);
-    p.enqueue(1, 3);
-    p.enqueue(1, 4);
-    p.enqueue(1000, 3);
-    p.enqueue(2000, 4);
-    p.enqueue(3000, 5);
-    p.print();
-    std::cout << p.dequeue() << std::endl;
-    std::cout << p.dequeue() << std::endl;
-    std::cout << p.dequeue() << std::endl;
-    std::cout << p.dequeue() << std::endl;
-    std::cout << p.dequeue() << std::endl;
-    std::cout << p.dequeue() << std::endl;
     return 0;
 }
