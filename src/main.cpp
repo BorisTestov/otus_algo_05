@@ -61,5 +61,15 @@ int main() {
 //        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
 //        std::cout << elements << " add: " << elapsed << " ms" << std::endl;
 //    }
+//    SparseArray<int> arr(10, 10);
+//    arr.add(1, 1, 2);
+//    arr.add(2, 2, 3);
+//    arr.add(2, 2, 5);
+//    arr.add(3, 3, 7);
+//    arr.add(5, 3, 7);
+//    arr.add(0, 2, 5);
+//    arr.print();
+//    arr.remove(2, 2);
+//    arr.print();
     return 0;
 }

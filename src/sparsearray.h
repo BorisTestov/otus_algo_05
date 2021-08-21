@@ -43,7 +43,7 @@ public:
     T get(unsigned int row, unsigned int col) {
         assert(row <= _maxRow);
         assert(col <= _maxColumn);
-        for (auto iterator = matrix.begin(); iterator != matrix.end(); ++iterator) {
+        for (auto iterator = matrix.begin(); iterator != matrix.end(); iterator++) {
             Node n = *iterator;
             if (n.row == row && n.column == col) {
                 return n.data;
@@ -77,7 +77,7 @@ public:
         assert(row <= _maxRow);
         assert(col <= _maxColumn);
         unsigned int indexToRemove = 0;
-        for (auto iterator = matrix.begin(); iterator != matrix.end(); ++iterator) {
+        for (auto iterator = matrix.begin(); iterator != matrix.end(); iterator++) {
             Node n = *iterator;
             if (n.row == row && n.column == col) {
                 matrix.pop(indexToRemove);
