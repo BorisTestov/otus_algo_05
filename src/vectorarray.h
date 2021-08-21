@@ -5,9 +5,10 @@
 template<class T>
 class VectorArray : public IArray<T> {
 public:
-    VectorArray() {
+    VectorArray(unsigned int step) {
         array = nullptr;
         _size = 0;
+        _step = step;
     }
 
     unsigned int size() override {
@@ -59,9 +60,11 @@ public:
     T remove(unsigned int index) override {
         if (index > capacity() - 1) throw std::out_of_range("Index is out of range!");
         T *newArray = new T[size() - 1];
+        unsigned int newIndex = 0;
         for (unsigned int i = 0; i < size(); ++i) {
             if (i == index) continue;
-            newArray[i] = get(i);
+            newArray[newIndex] = get(i);
+            ++newIndex;
         }
         delete[] array;
         array = newArray;
@@ -70,18 +73,18 @@ public:
 
 private:
     void resize() {
-        T *newArray = new T[size() + step];
+        T *newArray = new T[size() + _step];
         for (unsigned int i = 0; i < size(); ++i) {
             newArray[i] = get(i);
         }
         delete[] array;
         array = newArray;
-        _capacity += step;
+        _capacity += _step;
     }
 
     T *array;
 
     unsigned int _size;
     unsigned int _capacity = 0;
-    unsigned int step = 10;
+    unsigned int _step = 10;
 };

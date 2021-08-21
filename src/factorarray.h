@@ -3,9 +3,9 @@
 #include "iarray.h"
 
 template<class T>
-class SingleArray : public IArray<T> {
+class FactorArray : public IArray<T> {
 public:
-    SingleArray() {
+    FactorArray() {
         array = nullptr;
         _size = 0;
     }
@@ -14,18 +14,24 @@ public:
         return _size;
     }
 
+    unsigned int capacity() {
+        return _capacity;
+    }
+
     bool empty() override {
         return size() == 0;
     }
 
     void add(T item) override {
-        resize();
+        if (size() == capacity()) resize();
+        _size++;
         array[size() - 1] = item;
     }
 
     void add(T item, unsigned int index) override {
-        if (index > size()) throw std::out_of_range("Index is out of range!");
-        resize();
+        if (index > capacity()) throw std::out_of_range("Index is out of range!");
+        if (size() == capacity()) resize();
+        _size++;
         T *newArray = new T[size() + 1];
         for (unsigned int i = 0; i < index; ++i) {
             newArray[i] = get(i);
@@ -46,12 +52,12 @@ public:
     }
 
     T get(unsigned int index) override {
-        if (index > size() - 1) throw std::out_of_range("Index is out of range!");
+        if (index > capacity() - 1) throw std::out_of_range("Index is out of range!");
         return array[index];
     }
 
     T remove(unsigned int index) override {
-        if (index > size() - 1) throw std::out_of_range("Index is out of range!");
+        if (index > capacity() - 1) throw std::out_of_range("Index is out of range!");
         T *newArray = new T[size() - 1];
         unsigned int newIndex = 0;
         for (unsigned int i = 0; i < size(); ++i) {
@@ -66,15 +72,17 @@ public:
 
 private:
     void resize() {
-        T *newArray = new T[size() + 1];
+        T *newArray = new T[size() * 2 + 1];
         for (unsigned int i = 0; i < size(); ++i) {
             newArray[i] = get(i);
         }
         delete[] array;
         array = newArray;
-        _size++;
+        _capacity = _capacity * 2 + 1;
     }
 
     T *array;
+
     unsigned int _size;
+    unsigned int _capacity = 0;
 };
