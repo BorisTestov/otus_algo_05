@@ -26,7 +26,7 @@ public:
     }
 
     void print() override {
-        for (unsigned int i = 0; i <= (size() / _rowSize - (size() % _rowSize == 0)); ++i) {
+        for (unsigned int i = 0; i <= size() / _rowSize; ++i) {
             for (unsigned int j = 0; j < _rowSize; ++j) {
                 std::cout << array[i][j] << " ";
             }
@@ -53,6 +53,7 @@ public:
         if (currentLength % _rowSize == 0) {
             newArray[currentLength / _rowSize - 1] = row;
             row = new T[_rowSize];
+            for (unsigned int i = 0; i < _rowSize; ++i) row[i] = 0;
         }
         for (unsigned int i = index; i < size(); ++i) {
             row[currentLength % _rowSize] = array[i / _rowSize][i % _rowSize];
@@ -60,10 +61,10 @@ public:
             if (currentLength % _rowSize == 0) {
                 newArray[currentLength / _rowSize - 1] = row;
                 row = new T[_rowSize];
+                for (unsigned int i = 0; i < _rowSize; ++i) row[i] = 0;
             }
         }
         if (currentLength % _rowSize != 0) newArray[currentLength / _rowSize] = row;
-        delete[] array;
         array = newArray;
         _size++;
     }
@@ -75,27 +76,36 @@ public:
 
     T remove(unsigned int index) override {
         if (index > size() - 1) throw std::out_of_range("Index is out of range!");
-        T **newArray = size() % _rowSize == 1 ? new T *[size() / _rowSize - 1] : new T *[size() / _rowSize];
-        auto row = new T[_rowSize];
+        auto newArraySize = (size() - 1) / _rowSize + ((size() - 1) % _rowSize != 0);
+        T **newArray = new T *[newArraySize];
+        T removedElement = array[index / _rowSize][index % _rowSize];
+        T *row = new T[_rowSize];
         for (unsigned int i = 0; i < _rowSize; ++i) row[i] = 0;
         unsigned int currentLength = 0;
         for (unsigned int i = 0; i < size(); ++i) {
             if (i == index) continue;
             row[currentLength % _rowSize] = array[i / _rowSize][i % _rowSize];
-            ++currentLength;
+            currentLength++;
             if (currentLength % _rowSize == 0) {
                 newArray[currentLength / _rowSize - 1] = row;
+                delete[] row;
                 row = new T[_rowSize];
+                for (unsigned int j = 0; j < _rowSize; ++j) row[j] = 0;
             }
         }
-        if (currentLength % _rowSize != 0) newArray[currentLength / _rowSize] = row;
+        if (currentLength % _rowSize != 0) newArray[newArraySize - 1] = row;
+        delete[] row;
         delete[] array;
         array = newArray;
         _size--;
-        return array[index / _rowSize][index % _rowSize];
+        return removedElement;
     }
 
 private:
+    void free() {
+        delete[] array;
+    }
+
     void resize() {
         T **newArray = new T *[size() / _rowSize + 1];
         for (int i = 0; i < size() / _rowSize; ++i) {
@@ -104,7 +114,7 @@ private:
         auto row = new T[_rowSize];
         for (unsigned int i = 0; i < _rowSize; ++i) row[i] = 0;
         newArray[size() / _rowSize] = row;
-        delete[] array;
+        free();
         array = newArray;
     }
 

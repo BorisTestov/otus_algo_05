@@ -1,6 +1,7 @@
 #pragma once
 
 #include "iarray.h"
+#include <algorithm>
 
 template<class T>
 class SingleArray : public IArray<T> {
@@ -27,13 +28,9 @@ public:
         if (index > size()) throw std::out_of_range("Index is out of range!");
         resize();
         T *newArray = new T[size() + 1];
-        for (unsigned int i = 0; i < index; ++i) {
-            newArray[i] = get(i);
-        }
+        std::copy(array, array + index, newArray);
         newArray[index] = item;
-        for (unsigned int i = index + 1; i < size(); ++i) {
-            newArray[i] = get(i - 1);
-        }
+        std::copy(array + index, array + size(), newArray + index + 1);
         delete[] array;
         array = newArray;
     }
@@ -53,23 +50,19 @@ public:
     T remove(unsigned int index) override {
         if (index > size() - 1) throw std::out_of_range("Index is out of range!");
         T *newArray = new T[size() - 1];
-        unsigned int newIndex = 0;
-        for (unsigned int i = 0; i < size(); ++i) {
-            if (i == index) continue;
-            newArray[newIndex] = get(i);
-            ++newIndex;
-        }
+        T removedData = array[index];
+        std::copy(array, array + index, newArray);
+        std::copy(array + index + 1, array + size(), newArray + index);
         delete[] array;
         array = newArray;
         _size--;
+        return removedData;
     }
 
 private:
     void resize() {
         T *newArray = new T[size() + 1];
-        for (unsigned int i = 0; i < size(); ++i) {
-            newArray[i] = get(i);
-        }
+        std::copy(array, array + size(), newArray);
         delete[] array;
         array = newArray;
         _size++;
