@@ -41,9 +41,4 @@ public:
      * @return
      */
     virtual T remove(unsigned int index) = 0;
-
-    /**
-     * @brief Выводит элементы массива через пробел в std::cout
-     */
-    virtual void print() = 0;
 };

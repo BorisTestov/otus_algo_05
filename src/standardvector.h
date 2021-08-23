@@ -25,7 +25,7 @@ public:
         array.insert(array.begin() + index, item);
     }
 
-    void print() override {
+    void print() {
         for (unsigned int i = 0; i < size(); ++i) {
             std::cout << get(i) << " ";
         }

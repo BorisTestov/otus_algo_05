@@ -1,6 +1,7 @@
 #pragma once
 
 #include "iarray.h"
+#include <typeinfo>
 
 template<class T>
 class FactorArray : public IArray<T> {
@@ -40,7 +41,7 @@ public:
         array = newArray;
     }
 
-    void print() override {
+    void print() {
         for (unsigned int i = 0; i < size(); ++i) {
             std::cout << get(i) << " ";
         }
@@ -63,6 +64,16 @@ public:
         array = newArray;
         _size--;
         return removedData;
+    }
+
+    virtual const T &operator[](unsigned int _index) const {
+        if (_index >= _size)
+            throw std::invalid_argument("_index >= _size");
+        return array[_index];
+    }
+
+    virtual T &operator[](unsigned int _index) {
+        return const_cast<T &>(const_cast<const FactorArray &>(*this)[_index]);
     }
 
 private:

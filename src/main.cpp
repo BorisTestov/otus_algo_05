@@ -11,7 +11,7 @@
 #include <random>
 
 int main() {
-    unsigned int elements = 3200000;
+    unsigned int elements = 50000;
     std::random_device rd;
     std::mt19937 gen(rd());
     {
@@ -121,21 +121,24 @@ int main() {
     {
         std::cout << "========" << std::endl;
         std::cout << "Matrix array" << std::endl;
-        MatrixArray<int> matrix(3);
+        MatrixArray<int, 10> matrix;
         auto start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < elements; ++i) {
             matrix.add(i);
         }
+//        matrix.print();
         auto stop = std::chrono::high_resolution_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
         std::cout << elements << " add: " << elapsed << " ms" << std::endl;
         //
         elapsed = 0;
         start = std::chrono::high_resolution_clock::now();
-        while (!matrix.empty()) {
+        for (int i = 0; i < elements; ++i) {
             std::uniform_int_distribution<unsigned long long> distribution(0, matrix.size() - 1);
             auto index = distribution(gen);
+//            std::cout << "Removing index " << index << std::endl;
             matrix.remove(index);
+//            matrix.print();
         }
         stop = std::chrono::high_resolution_clock::now();
         elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
@@ -147,6 +150,7 @@ int main() {
             auto index = distribution(gen);
             matrix.add(i, index);
         }
+//        matrix.print();
         stop = std::chrono::high_resolution_clock::now();
         elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
         std::cout << elements << " random add: " << elapsed << " ms" << std::endl;

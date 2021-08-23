@@ -1,124 +1,74 @@
-#pragma once
-
-#include "iarray.h"
-
-template<class T>
+template<typename T, unsigned int N>
 class MatrixArray : public IArray<T> {
 public:
-    MatrixArray(unsigned int rowSize) {
-        array = nullptr;
-        _size = 0;
-        _rowSize = rowSize;
+    MatrixArray() = default;
+
+    virtual void add(T item, unsigned int index) override {
+        if (index > _size)
+            throw std::out_of_range("Index is out of range!");
+        if (_size == array.size() * N) {
+            std::array<T, N> newLine;
+            std::fill(newLine.begin(), newLine.end(), 0);
+            array.add(newLine, array.size());
+        }
+        for (unsigned int i = _size; i > index; --i)
+            array[i / N][i % N] = std::move(array[(i - 1) / N][(i - 1) % N]);
+        array[index / N][index % N] = std::move(item);
+        ++_size;
     }
 
-    unsigned int size() override {
-        return _size;
+    virtual T remove(unsigned int index) override  // возвращает удаляемый элемент
+    {
+        if (index >= _size)
+            throw std::out_of_range("Index is out of range!");
+        T res = array[index / N][index % N];
+        for (unsigned int i = index; i < _size - 1; ++i)
+            array[i / N][i % N] = std::move(array[(i + 1) / N][(i + 1) % N]);
+        array[(size() - 1) / N][(size() - 1) % N] = 0;
+        --_size;
+        if (_size % N == 0) {
+            array.remove(array.size() - 1);
+        }
+        return res;
+    }
+
+    virtual unsigned int size() override { return _size; }
+
+    virtual const T &operator[](unsigned int index) const {
+        if (index >= _size)
+            throw std::out_of_range("Index is out of range!");
+        return array[index / N][index % N];
+    }
+
+    virtual T &operator[](unsigned int index) {
+        return const_cast<T &>(const_cast<const MatrixArray &>(*this)[index]);
+    }
+
+    void print() {
+        unsigned int rows = _size / N;
+        _size % N != 0 ? rows += 1 : rows += 0;
+        for (unsigned i = 0; i < rows; ++i) {
+            auto row = array[i];
+            for (const T &j: row) {
+                std::cout << j << " ";
+            }
+            std::cout << "\n";
+        }
     }
 
     bool empty() override {
         return _size == 0;
     }
 
-    void add(T item) override {
-        if (_size % _rowSize == 0) resize();
-        array[size() / _rowSize][size() % _rowSize] = item;
-        _size++;
-    }
-
-    void print() override {
-        for (unsigned int i = 0; i <= size() / _rowSize; ++i) {
-            for (unsigned int j = 0; j < _rowSize; ++j) {
-                std::cout << array[i][j] << " ";
-            }
-            std::cout << std::endl;
-        }
-    }
-
-    void add(T item, unsigned int index) override {
-        if (index > size()) throw std::out_of_range("Index is out of range!");
-        T **newArray = size() % _rowSize == 0 ? new T *[size() / _rowSize + 1] : new T *[size() / _rowSize];
-        auto row = new T[_rowSize];
-        for (unsigned int i = 0; i < _rowSize; ++i) row[i] = 0;
-        unsigned int currentLength = 0;
-        for (unsigned int i = 0; i < index; ++i) {
-            row[currentLength % _rowSize] = array[i / _rowSize][i % _rowSize];
-            ++currentLength;
-            if (currentLength % _rowSize == 0) {
-                newArray[currentLength / _rowSize - 1] = row;
-                row = new T[_rowSize];
-            }
-        }
-        row[currentLength % _rowSize] = item;
-        ++currentLength;
-        if (currentLength % _rowSize == 0) {
-            newArray[currentLength / _rowSize - 1] = row;
-            row = new T[_rowSize];
-            for (unsigned int i = 0; i < _rowSize; ++i) row[i] = 0;
-        }
-        for (unsigned int i = index; i < size(); ++i) {
-            row[currentLength % _rowSize] = array[i / _rowSize][i % _rowSize];
-            ++currentLength;
-            if (currentLength % _rowSize == 0) {
-                newArray[currentLength / _rowSize - 1] = row;
-                row = new T[_rowSize];
-                for (unsigned int i = 0; i < _rowSize; ++i) row[i] = 0;
-            }
-        }
-        if (currentLength % _rowSize != 0) newArray[currentLength / _rowSize] = row;
-        array = newArray;
-        _size++;
-    }
-
     T get(unsigned int index) override {
-        if (index > size() - 1) throw std::out_of_range("Index is out of range!");
-        return array[index / _rowSize][index % _rowSize];
+        return array[index / N][index % N];
     }
 
-    T remove(unsigned int index) override {
-        if (index > size() - 1) throw std::out_of_range("Index is out of range!");
-        auto newArraySize = (size() - 1) / _rowSize + ((size() - 1) % _rowSize != 0);
-        T **newArray = new T *[newArraySize];
-        T removedElement = array[index / _rowSize][index % _rowSize];
-        T *row = new T[_rowSize];
-        for (unsigned int i = 0; i < _rowSize; ++i) row[i] = 0;
-        unsigned int currentLength = 0;
-        for (unsigned int i = 0; i < size(); ++i) {
-            if (i == index) continue;
-            row[currentLength % _rowSize] = array[i / _rowSize][i % _rowSize];
-            currentLength++;
-            if (currentLength % _rowSize == 0) {
-                newArray[currentLength / _rowSize - 1] = row;
-                delete[] row;
-                row = new T[_rowSize];
-                for (unsigned int j = 0; j < _rowSize; ++j) row[j] = 0;
-            }
-        }
-        if (currentLength % _rowSize != 0) newArray[newArraySize - 1] = row;
-        delete[] row;
-        delete[] array;
-        array = newArray;
-        _size--;
-        return removedElement;
+    void add(T item) override {
+        add(item, size());
     }
 
 private:
-    void free() {
-        delete[] array;
-    }
-
-    void resize() {
-        T **newArray = new T *[size() / _rowSize + 1];
-        for (int i = 0; i < size() / _rowSize; ++i) {
-            newArray[i] = array[i];
-        }
-        auto row = new T[_rowSize];
-        for (unsigned int i = 0; i < _rowSize; ++i) row[i] = 0;
-        newArray[size() / _rowSize] = row;
-        free();
-        array = newArray;
-    }
-
-    T **array;
-    unsigned int _size;
-    unsigned int _rowSize;
+    FactorArray<std::array<T, N>> array;
+    unsigned int _size = 0;
 };

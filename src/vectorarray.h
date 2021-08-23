@@ -5,6 +5,11 @@
 template<class T>
 class VectorArray : public IArray<T> {
 public:
+    VectorArray() {
+        _size = 0;
+        array = nullptr;
+    };
+
     VectorArray(unsigned int step) {
         array = nullptr;
         _size = 0;
@@ -41,7 +46,7 @@ public:
         array = newArray;
     }
 
-    void print() override {
+    void print() {
         for (unsigned int i = 0; i < size(); ++i) {
             std::cout << get(i) << " ";
         }
@@ -65,6 +70,10 @@ public:
         _size--;
         return removedData;
     }
+
+//    ~VectorArray() {
+//        delete[] array;
+//    }
 
 private:
     void resize() {
